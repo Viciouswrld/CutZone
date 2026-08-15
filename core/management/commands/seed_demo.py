@@ -115,10 +115,21 @@ class Command(BaseCommand):
             )
             barbers[barber.name] = barber
             self._log("Barber", barber.name, created)
-            # Attach the bundled demo photo if present in media/barbers/.
-            photo_rel = f"barbers/{barber.name.lower()}.jpg"
+            # Attach the custom barber photo from media/barbers/.
+            # These are the actual .jfif filenames in the project.
+            photo_files = {
+                "Victor": "barbers/14144186326911993.jfif",
+                "Jacob": "barbers/A_good_haircut_makes_you_joyful_.jfif",
+                "Emmanuel": "barbers/Wave_home_noir.jfif",
+                "John": "barbers/We_always_have_your_back__harmonyclud.jfif",
+            }
+
+            photo_rel = photo_files.get(barber.name)
+
             from django.conf import settings as dj_settings
-            if not barber.photo and (dj_settings.MEDIA_ROOT / photo_rel).exists():
+
+            # Always update the photo so any old .jpg assignment is replaced.
+            if photo_rel and (dj_settings.MEDIA_ROOT / photo_rel).exists():
                 barber.photo = photo_rel
                 barber.save()
             for weekday in range(7):
