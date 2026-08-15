@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Server Error — CutZone{% endblock %}
+{% block content %}
+<section class="py-5 text-center">
+  <div class="container py-5">
+    <h1 class="display-1 text-gold">500</h1>
+    <h3>Something went wrong</h3>
+    <p class="text-secondary">Our clippers jammed for a second. Please try again shortly.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-gold mt-3">Back to Home</a>
+  </div>
+</section>
+{% endblock %}

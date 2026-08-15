@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Our Barbers — CutZone Barbershop{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-4">
+      <h1 class="section-title d-inline-block">Meet Our Barbers</h1>
+      <p class="text-secondary">Choose your favourite and book him directly.</p>
+    </div>
+
+    <form method="get" class="row justify-content-center mb-5">
+      <div class="col-md-5 d-flex gap-2">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search barbers…">
+        <button class="btn btn-gold" type="submit"><i class="bi bi-search"></i></button>
+      </div>
+    </form>
+
+    <div class="row g-4">
+      {% for barber in barbers %}
+      <div class="col-sm-6 col-lg-3">
+        <div class="cz-card p-4 text-center">
+          <img src="{{ barber.photo_url }}" alt="{{ barber.name }}" class="barber-photo mb-3">
+          <h5 class="card-title mb-1">{{ barber.name }}</h5>
+          <p class="text-gold small mb-1">{{ barber.specialization }}</p>
+          {% if barber.avg_rating %}
+            <p class="small mb-2"><i class="bi bi-star-fill star"></i> {{ barber.avg_rating|floatformat:1 }} <span class="text-secondary">({{ barber.review_count }} review{{ barber.review_count|pluralize }})</span></p>
+          {% endif %}
+          <p class="text-secondary small">{{ barber.bio }}</p>
+          <a href="{% url 'bookings:book' %}?barber={{ barber.pk }}" class="btn btn-outline-gold btn-sm">Book with {{ barber.name }}</a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-secondary py-5">
+        <i class="bi bi-search fs-1 d-block mb-3"></i>
+        No barbers found{% if query %} for “{{ query }}”{% endif %}.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

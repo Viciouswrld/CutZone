@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Appointment {{ appt.reference }} — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="receipt-card p-4 p-md-5">
+      <div class="text-center mb-4">
+        <h3 class="mb-0"><i class="bi bi-scissors me-1"></i>CUTZONE</h3>
+        <div class="small text-secondary">Appointment Details</div>
+        <hr class="divider-gold mx-auto mt-3">
+      </div>
+
+      <div class="receipt-row"><span class="text-secondary">Booking Reference</span><strong class="text-gold">{{ appt.reference }}</strong></div>
+      <div class="receipt-row"><span class="text-secondary">Customer</span><span>{{ appt.customer.get_full_name|default:appt.customer.username }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Service</span><span>{{ appt.service.name }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Barber</span><span>{{ appt.barber.name }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Date</span><span>{{ appt.date|date:"l, d F Y" }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Time</span><span>{{ appt.start_time|time:"g:i A" }} – {{ appt.end_time|time:"g:i A" }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Duration</span><span>{{ appt.duration_minutes }} minutes</span></div>
+      <div class="receipt-row"><span class="text-secondary">Price</span><strong>₦{{ appt.price|floatformat:0|intcomma }}</strong></div>
+      <div class="receipt-row"><span class="text-secondary">Status</span><span class="badge-status badge-{{ appt.status }}">{{ appt.get_status_display }}</span></div>
+      {% if appt.notes %}
+      <div class="receipt-row"><span class="text-secondary">Notes</span><span>{{ appt.notes }}</span></div>
+      {% endif %}
+      <div class="receipt-row"><span class="text-secondary">Booked on</span><span>{{ appt.created_at|date:"d M Y, g:i A" }}</span></div>
+
+      {% if appt.review %}
+      <div class="mt-4 p-3 rounded" style="background: rgba(201,162,39,0.08);">
+        <div class="small text-secondary mb-1">Your review</div>
+        {% for _ in appt.review.stars %}<i class="bi bi-star-fill star"></i>{% endfor %}{% for _ in appt.review.empty_stars %}<i class="bi bi-star star-empty"></i>{% endfor %}
+        <p class="small mb-0 mt-1">{{ appt.review.comment }}</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="text-center mt-4 d-flex gap-2 justify-content-center flex-wrap no-print">
+      <button onclick="window.print()" class="btn btn-outline-gold"><i class="bi bi-printer me-2"></i>Print</button>
+      {% if appt.can_reschedule %}<a href="{% url 'bookings:reschedule' appt.pk %}" class="btn btn-gold"><i class="bi bi-arrow-repeat me-2"></i>Reschedule</a>{% endif %}
+      {% if appt.can_cancel %}<a href="{% url 'bookings:cancel' appt.pk %}" class="btn btn-outline-danger"><i class="bi bi-x-circle me-2"></i>Cancel</a>{% endif %}
+      {% if appt.can_review %}<a href="{% url 'reviews:leave' appt.pk %}" class="btn btn-gold"><i class="bi bi-star me-2"></i>Leave a Review</a>{% endif %}
+      <a href="{% url 'bookings:my_appointments' %}" class="btn btn-outline-gold">Back</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

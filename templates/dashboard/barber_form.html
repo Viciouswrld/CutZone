@@ -1,0 +1,45 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}{{ title }} — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="mb-0">{{ title }}</h3>
+  <a href="{% url 'dashboard:barbers' %}" class="btn btn-outline-gold btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="cz-card p-4" style="max-width: 680px;">
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="mb-3">
+      <label class="form-label">Name *</label>
+      {{ form.name }}
+      {% for e in form.name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Photo</label>
+      {% if barber and barber.photo %}
+        <div class="mb-2"><img src="{{ barber.photo_url }}" class="barber-photo" style="width:70px;height:70px;" alt=""></div>
+      {% endif %}
+      {{ form.photo }}
+      {% for e in form.photo.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Specialization</label>
+      {{ form.specialization }}
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Biography</label>
+      {{ form.bio }}
+    </div>
+    <div class="form-check form-switch mb-4">
+      {{ form.is_active }}
+      <label class="form-check-label">Active (bookable by customers)</label>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-gold">Save Barber</button>
+      <a href="{% url 'dashboard:barbers' %}" class="btn btn-outline-gold">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

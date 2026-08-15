@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Login — CutZone{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <i class="bi bi-scissors text-gold fs-1"></i>
+      <h3 class="mt-2">Welcome Back</h3>
+      <p class="text-secondary small">Log in to manage your appointments.</p>
+    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">Invalid username or password. Please try again.</div>
+      {% endif %}
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        {{ form.password }}
+      </div>
+      <button type="submit" class="btn btn-gold w-100">Log In</button>
+      <input type="hidden" name="next" value="{{ next }}">
+    </form>
+    <div class="d-flex justify-content-between small mt-3">
+      <a href="{% url 'accounts:password_reset' %}">Forgot password?</a>
+      <a href="{% url 'accounts:register' %}">Create account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

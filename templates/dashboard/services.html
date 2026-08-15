@@ -1,0 +1,44 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load humanize %}
+{% block title %}Services — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="mb-0">Manage Services</h3>
+  <a href="{% url 'dashboard:service_add' %}" class="btn btn-gold"><i class="bi bi-plus-lg me-1"></i>Add Service</a>
+</div>
+
+<div class="cz-card p-4">
+  <div class="table-responsive">
+    <table class="table table-cz table-hover align-middle">
+      <thead><tr><th>Name</th><th>Description</th><th>Price</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for s in services %}
+        <tr>
+          <td class="fw-semibold">{{ s.name }}</td>
+          <td class="text-secondary small">{{ s.description|truncatechars:60 }}</td>
+          <td class="text-gold">₦{{ s.price|floatformat:0|intcomma }}</td>
+          <td>{{ s.duration_minutes }} min</td>
+          <td>{% if s.is_active %}<span class="badge-status badge-completed">Active</span>{% else %}<span class="badge-status badge-cancelled">Inactive</span>{% endif %}</td>
+          <td class="d-flex gap-1 flex-wrap">
+            <a href="{% url 'dashboard:service_edit' s.pk %}" class="btn btn-outline-gold btn-sm"><i class="bi bi-pencil"></i></a>
+            <form method="post" action="{% url 'dashboard:service_toggle' s.pk %}">{% csrf_token %}
+              <button class="btn btn-sm {% if s.is_active %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                {% if s.is_active %}Deactivate{% else %}Activate{% endif %}
+              </button>
+            </form>
+            <form method="post" action="{% url 'dashboard:service_delete' s.pk %}"
+                  onsubmit="return confirm('Delete service {{ s.name }}? If it has bookings it will be deactivated instead.');">
+              {% csrf_token %}
+              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-secondary">No services yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

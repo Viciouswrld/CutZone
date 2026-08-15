@@ -1,0 +1,43 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Edit Schedule — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="mb-0">Schedule — {{ barber.name }}</h3>
+  <a href="{% url 'dashboard:schedules' %}" class="btn btn-outline-gold btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="cz-card p-4" style="max-width: 760px;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <div class="table-responsive">
+      <table class="table table-cz align-middle">
+        <thead><tr><th>Day</th><th>Working?</th><th>Start</th><th>End</th></tr></thead>
+        <tbody>
+          {% for f in formset %}
+          <tr>
+            {{ f.id }}
+            <td>
+              {{ f.weekday.as_hidden }}
+              {{ f.instance.get_weekday_display }}
+            </td>
+            <td>{{ f.is_working }}</td>
+            <td>{{ f.start_time }}</td>
+            <td>{{ f.end_time }}</td>
+          </tr>
+          {% if f.errors %}
+          <tr><td colspan="4"><div class="text-danger small">{{ f.errors }}</div></td></tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-secondary small">Note: bookable hours are always limited to shop hours (8:00 AM – 7:00 PM), even if a longer shift is entered.</p>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-gold">Save Schedule</button>
+      <a href="{% url 'dashboard:schedules' %}" class="btn btn-outline-gold">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

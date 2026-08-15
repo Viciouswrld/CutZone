@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Cancel Appointment — CutZone{% endblock %}
+{% block content %}
+<section class="py-5">
+  <div class="container" style="max-width: 560px;">
+    <div class="cz-card p-4 text-center">
+      <i class="bi bi-exclamation-triangle text-warning" style="font-size:3rem;"></i>
+      <h4 class="mt-3">Cancel this appointment?</h4>
+      <p class="text-secondary">
+        <strong class="text-gold">{{ appt.reference }}</strong><br>
+        {{ appt.service.name }} with {{ appt.barber.name }}<br>
+        {{ appt.date|date:"l, d F Y" }} at {{ appt.start_time|time:"g:i A" }}
+      </p>
+      <p class="text-secondary small">This action cannot be undone, but the booking will remain in your history.</p>
+      <form method="post" class="d-flex gap-2 justify-content-center">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Cancel It</button>
+        <a href="{% url 'bookings:detail' appt.pk %}" class="btn btn-outline-gold">No, Keep It</a>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

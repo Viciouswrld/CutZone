@@ -1,0 +1,95 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load humanize %}
+{% block title %}Manage Appointments — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<h3 class="mb-4">Manage Appointments</h3>
+
+<!-- Filters -->
+<div class="cz-card p-3 mb-4">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label small">Search (ref / customer)</label>
+      <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="e.g. CZ-2026-0001">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Status</label>
+      <select name="status" class="form-select form-select-sm">
+        <option value="">All</option>
+        {% for value, label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Barber</label>
+      <select name="barber" class="form-select form-select-sm">
+        <option value="">All</option>
+        {% for b in barbers %}<option value="{{ b.pk }}" {% if barber_id == b.pk|stringformat:'s' %}selected{% endif %}>{{ b.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Service</label>
+      <select name="service" class="form-select form-select-sm">
+        <option value="">All</option>
+        {% for s in services %}<option value="{{ s.pk }}" {% if service_id == s.pk|stringformat:'s' %}selected{% endif %}>{{ s.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label small">Date</label>
+      <input type="date" name="date" value="{{ date }}" class="form-control form-control-sm">
+    </div>
+    <div class="col-md-1 d-flex gap-1">
+      <button class="btn btn-gold btn-sm" type="submit"><i class="bi bi-funnel"></i></button>
+      <a href="{% url 'dashboard:appointments' %}" class="btn btn-outline-gold btn-sm"><i class="bi bi-x"></i></a>
+    </div>
+  </form>
+  <div class="mt-2 d-flex gap-2">
+    <a href="?when=today" class="btn btn-sm {% if when == 'today' %}btn-gold{% else %}btn-outline-gold{% endif %}">Today</a>
+    <a href="?when=upcoming" class="btn btn-sm {% if when == 'upcoming' %}btn-gold{% else %}btn-outline-gold{% endif %}">Upcoming</a>
+  </div>
+</div>
+
+<div class="cz-card p-4">
+  {% if page.object_list %}
+  <div class="table-responsive">
+    <table class="table table-cz table-hover align-middle">
+      <thead><tr><th>Ref</th><th>Customer</th><th>Service</th><th>Barber</th><th>Date</th><th>Time</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for a in page.object_list %}
+        <tr>
+          <td class="text-gold small">{{ a.reference }}</td>
+          <td>
+            <div>{{ a.customer.get_full_name|default:a.customer.username }}</div>
+            <div class="text-secondary small">{{ a.customer.email }}</div>
+          </td>
+          <td>{{ a.service.name }}</td>
+          <td>{{ a.barber.name }}</td>
+          <td>{{ a.date|date:"D, d M Y" }}</td>
+          <td>{{ a.start_time|time:"g:i A" }}–{{ a.end_time|time:"g:i A" }}</td>
+          <td>₦{{ a.price|floatformat:0|intcomma }}</td>
+          <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+          <td>{% include "dashboard/_status_actions.html" with a=a %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if page.has_other_pages %}
+  <nav>
+    <ul class="pagination pagination-sm justify-content-center mb-0">
+      {% if page.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&q={{ q }}&status={{ status }}&barber={{ barber_id }}&service={{ service_id }}&date={{ date }}&when={{ when }}">‹</a></li>
+      {% endif %}
+      <li class="page-item active"><span class="page-link">{{ page.number }} / {{ page.paginator.num_pages }}</span></li>
+      {% if page.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&q={{ q }}&status={{ status }}&barber={{ barber_id }}&service={{ service_id }}&date={{ date }}&when={{ when }}">›</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+  {% else %}
+  <p class="text-secondary mb-0">No appointments match your filters.</p>
+  {% endif %}
+</div>
+{% endblock %}

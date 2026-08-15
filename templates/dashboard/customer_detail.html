@@ -1,0 +1,46 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load humanize %}
+{% block title %}{{ customer.username }} — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="mb-0">Customer: {{ customer.get_full_name|default:customer.username }}</h3>
+  <a href="{% url 'dashboard:customers' %}" class="btn btn-outline-gold btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="cz-card p-4 mb-4">
+  <div class="row g-3">
+    <div class="col-md-3"><div class="text-secondary small">Username</div>{{ customer.username }}</div>
+    <div class="col-md-3"><div class="text-secondary small">Email</div>{{ customer.email|default:"—" }}</div>
+    <div class="col-md-3"><div class="text-secondary small">Phone</div>{{ customer.profile.phone|default:"—" }}</div>
+    <div class="col-md-3"><div class="text-secondary small">Joined</div>{{ customer.date_joined|date:"d M Y" }}</div>
+  </div>
+</div>
+
+<div class="cz-card p-4">
+  <h5 class="mb-3">Appointment History ({{ appointments|length }})</h5>
+  {% if appointments %}
+  <div class="table-responsive">
+    <table class="table table-cz table-hover align-middle">
+      <thead><tr><th>Ref</th><th>Service</th><th>Barber</th><th>Date</th><th>Time</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for a in appointments %}
+        <tr>
+          <td class="text-gold small">{{ a.reference }}</td>
+          <td>{{ a.service.name }}</td>
+          <td>{{ a.barber.name }}</td>
+          <td>{{ a.date|date:"d M Y" }}</td>
+          <td>{{ a.start_time|time:"g:i A" }}</td>
+          <td>₦{{ a.price|floatformat:0|intcomma }}</td>
+          <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+          <td>{% include "dashboard/_status_actions.html" with a=a %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-secondary mb-0">No appointments yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}About — CutZone Barbershop Owerri{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="section-title d-inline-block">About CutZone</h1>
+      <p class="text-secondary">More than a haircut — a standard.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="cz-card p-4 h-100">
+          <h4><i class="bi bi-scissors text-gold me-2"></i>Who We Are</h4>
+          <p class="text-secondary">CutZone is a premium barbershop located in the heart of Owerri, Imo State.
+            We were founded with one simple belief: every man deserves a sharp cut, a clean
+            finish, and a place where he's treated like a regular from day one.</p>
+          <p class="text-secondary mb-0">Our team of four master barbers — Victor, Jacob, Emmanuel and John — each bring
+            their own specialty to the chair, from razor-sharp fades to expert beard sculpting
+            and creative hair designs.</p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="cz-card p-4 h-100">
+          <h4><i class="bi bi-bullseye text-gold me-2"></i>Our Mission</h4>
+          <p class="text-secondary">To deliver world-class barbering to Owerri — combining traditional craftsmanship
+            with modern style, honest pricing in Naira, and a booking experience so smooth
+            you'll never wait in line again.</p>
+          <p class="text-secondary mb-0">We keep our standards high: sterilized tools, premium products, and barbers who
+            listen before they cut.</p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="cz-card p-4 h-100">
+          <h4><i class="bi bi-award text-gold me-2"></i>Professional Barbering</h4>
+          <p class="text-secondary mb-0">Every CutZone barber is trained across classic and contemporary techniques.
+            Whether it's a low taper, a full grooming package, or your son's first haircut,
+            you're in experienced hands. We respect your time — appointments are scheduled to
+            the minute so your barber is ready when you arrive.</p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="cz-card p-4 h-100">
+          <h4><i class="bi bi-emoji-smile text-gold me-2"></i>The Customer Experience</h4>
+          <p class="text-secondary mb-0">From the moment you book online to the final brush-off, everything at CutZone is
+            designed around you: easy scheduling, reminders on your dashboard, transparent
+            prices, and a chair that feels like yours. Look sharp. Feel fresh. That's the
+            CutZone promise.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{% url 'bookings:book' %}" class="btn btn-gold btn-lg">Book Your First Cut</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static humanize %}
+{% block title %}Book Appointment — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="section-title d-inline-block">Book an Appointment</h1>
+      <p class="text-secondary">Choose service → barber → date → time → confirm.</p>
+    </div>
+
+    <form id="booking-form" method="post"
+          data-slots-url="{% url 'bookings:slots' %}" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="service" id="id_service" value="">
+      <input type="hidden" name="barber" id="id_barber" value="">
+      <input type="hidden" name="start_time" id="id_start_time" value="">
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}<br>{% endfor %}</div>
+      {% endif %}
+
+      <!-- Step 1: service -->
+      <div class="mb-5">
+        <h5 class="mb-3"><span class="step-number">1</span>Choose a Service</h5>
+        <div class="row g-3">
+          {% for service in services %}
+          <div class="col-md-4">
+            <div class="choice-card text-center {% if preselect_service == service.pk|stringformat:'s' %}preselected{% endif %}"
+                 data-target="id_service" data-value="{{ service.pk }}" data-label="{{ service.name }}">
+              <h6 class="mb-1">{{ service.name }}</h6>
+              <div class="text-gold fw-bold">₦{{ service.price|floatformat:0|intcomma }}</div>
+              <span class="duration-badge d-inline-block mt-1">{{ service.duration_minutes }} min</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Step 2: barber -->
+      <div class="mb-5">
+        <h5 class="mb-3"><span class="step-number">2</span>Choose Your Barber</h5>
+        <div class="row g-3">
+          {% for barber in barbers %}
+          <div class="col-6 col-md-3">
+            <div class="choice-card text-center {% if preselect_barber == barber.pk|stringformat:'s' %}preselected{% endif %}"
+                 data-target="id_barber" data-value="{{ barber.pk }}" data-label="{{ barber.name }}">
+              <img src="{{ barber.photo_url }}" alt="{{ barber.name }}" class="barber-photo mb-2" style="width:72px;height:72px;">
+              <h6 class="mb-0">{{ barber.name }}</h6>
+              <div class="text-secondary small">{{ barber.specialization|truncatechars:28 }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Step 3: date -->
+      <div class="mb-5">
+        <h5 class="mb-3"><span class="step-number">3</span>Choose a Date</h5>
+        <div class="col-md-4">
+          <input type="date" name="date" id="id_date" class="form-control"
+                 min="{{ min_date }}" max="{{ max_date }}" required>
+          {% for e in form.date.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <!-- Step 4: time -->
+      <div class="mb-5">
+        <h5 class="mb-3"><span class="step-number">4</span>Choose an Available Time</h5>
+        <p id="slots-hint" class="text-secondary small">Select a service, barber and date to see available times.</p>
+        <div id="slots-box" class="d-flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Step 5: confirm -->
+      <div class="mb-4">
+        <h5 class="mb-3"><span class="step-number">5</span>Confirm Your Booking</h5>
+        <div class="cz-card p-4">
+          <p id="summary-box" class="text-gold mb-3">Your selection will appear here.</p>
+          <label class="form-label">Notes for your barber (optional)</label>
+          <textarea name="notes" id="id_notes" rows="2" class="form-control mb-3"
+                    placeholder="e.g. low fade, keep the top longer…"></textarea>
+          <button type="submit" id="submit-btn" class="btn btn-gold btn-lg" disabled>
+            <i class="bi bi-check2-circle me-2"></i>Confirm Booking
+          </button>
+          <p class="text-secondary small mt-2 mb-0">Shop hours: 8:00 AM – 7:00 PM · Your booking will start as <strong>Pending</strong> until confirmed by the shop.</p>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/booking.js' %}"></script>
+{% endblock %}

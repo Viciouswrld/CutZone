@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Booking Confirmed — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-4 no-print">
+      <i class="bi bi-check-circle text-gold" style="font-size:3.5rem;"></i>
+      <h2 class="mt-2">Booking Received!</h2>
+      <p class="text-secondary">Your appointment has been booked. Keep your reference number safe.</p>
+    </div>
+
+    <!-- Printable receipt -->
+    <div class="receipt-card p-4 p-md-5">
+      <div class="text-center mb-4">
+        <h3 class="mb-0"><i class="bi bi-scissors me-1"></i>CUTZONE</h3>
+        <div class="small text-secondary">Premium Barbershop · 15 Okigwe Road, Owerri</div>
+        <hr class="divider-gold mx-auto mt-3">
+      </div>
+
+      <div class="receipt-row"><span class="text-secondary">Booking Reference</span><strong class="text-gold">{{ appt.reference }}</strong></div>
+      <div class="receipt-row"><span class="text-secondary">Customer</span><span>{{ appt.customer.get_full_name|default:appt.customer.username }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Service</span><span>{{ appt.service.name }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Barber</span><span>{{ appt.barber.name }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Date</span><span>{{ appt.date|date:"l, d F Y" }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Time</span><span>{{ appt.start_time|time:"g:i A" }} – {{ appt.end_time|time:"g:i A" }}</span></div>
+      <div class="receipt-row"><span class="text-secondary">Duration</span><span>{{ appt.duration_minutes }} minutes</span></div>
+      <div class="receipt-row"><span class="text-secondary">Price</span><strong>₦{{ appt.price|floatformat:0|intcomma }}</strong></div>
+      <div class="receipt-row"><span class="text-secondary">Status</span><span class="badge-status badge-{{ appt.status }}">{{ appt.get_status_display }}</span></div>
+
+      <div class="text-center mt-4 small text-secondary">
+        Thank you for choosing CutZone. Please arrive 5 minutes early.
+      </div>
+    </div>
+
+    <div class="text-center mt-4 d-flex gap-2 justify-content-center flex-wrap no-print">
+      <button onclick="window.print()" class="btn btn-gold"><i class="bi bi-printer me-2"></i>Print Booking</button>
+      <a href="{% url 'bookings:my_appointments' %}" class="btn btn-outline-gold">My Appointments</a>
+      <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-gold">Dashboard</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Reviews — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<h3 class="mb-4">Moderate Reviews</h3>
+
+<div class="cz-card p-4">
+  {% if reviews %}
+  <div class="table-responsive">
+    <table class="table table-cz table-hover align-middle">
+      <thead><tr><th>Customer</th><th>Barber / Service</th><th>Rating</th><th>Comment</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for r in reviews %}
+        <tr>
+          <td>{{ r.customer.get_full_name|default:r.customer.username }}</td>
+          <td class="small">{{ r.appointment.barber.name }} · {{ r.appointment.service.name }}</td>
+          <td>{% for _ in r.stars %}<i class="bi bi-star-fill star"></i>{% endfor %}</td>
+          <td class="small text-secondary" style="max-width:320px;">{{ r.comment|truncatechars:120 }}</td>
+          <td class="small">{{ r.created_at|date:"d M Y" }}</td>
+          <td>{% if r.is_approved %}<span class="badge-status badge-completed">Visible</span>{% else %}<span class="badge-status badge-cancelled">Hidden</span>{% endif %}</td>
+          <td class="d-flex gap-1">
+            <form method="post" action="{% url 'dashboard:review_toggle' r.pk %}">{% csrf_token %}
+              <button class="btn btn-sm {% if r.is_approved %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                {% if r.is_approved %}Hide{% else %}Approve{% endif %}
+              </button>
+            </form>
+            <form method="post" action="{% url 'dashboard:review_delete' r.pk %}"
+                  onsubmit="return confirm('Delete this review permanently?');">
+              {% csrf_token %}
+              <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-secondary mb-0">No reviews yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

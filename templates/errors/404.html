@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found — CutZone{% endblock %}
+{% block content %}
+<section class="py-5 text-center">
+  <div class="container py-5">
+    <h1 class="display-1 text-gold">404</h1>
+    <h3>Page not found</h3>
+    <p class="text-secondary">Looks like this page took a clean shave. Let's get you back on track.</p>
+    <a href="{% url 'core:home' %}" class="btn btn-gold mt-3">Back to Home</a>
+  </div>
+</section>
+{% endblock %}

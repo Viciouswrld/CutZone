@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}My Appointments — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+      <h2 class="mb-0">My Appointments</h2>
+      <a href="{% url 'bookings:book' %}" class="btn btn-gold"><i class="bi bi-calendar-plus me-1"></i>New Booking</a>
+    </div>
+
+    <!-- Status filter -->
+    <form method="get" class="mb-4 d-flex gap-2 flex-wrap">
+      <select name="status" class="form-select" style="max-width: 220px;">
+        <option value="">All statuses</option>
+        {% for value, label in statuses %}
+          <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-outline-gold" type="submit">Filter</button>
+    </form>
+
+    <!-- Upcoming -->
+    <div class="cz-card p-4 mb-4">
+      <h5 class="mb-3"><i class="bi bi-calendar-event text-gold me-2"></i>Upcoming</h5>
+      {% if upcoming %}
+      <div class="table-responsive">
+        <table class="table table-cz table-hover align-middle">
+          <thead><tr><th>Ref</th><th>Service</th><th>Barber</th><th>Date</th><th>Time</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for a in upcoming %}
+            <tr>
+              <td class="text-gold small">{{ a.reference }}</td>
+              <td>{{ a.service.name }}</td>
+              <td>{{ a.barber.name }}</td>
+              <td>{{ a.date|date:"D, d M Y" }}</td>
+              <td>{{ a.start_time|time:"g:i A" }}</td>
+              <td>₦{{ a.price|floatformat:0|intcomma }}</td>
+              <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+              <td class="d-flex gap-1 flex-wrap">
+                <a href="{% url 'bookings:detail' a.pk %}" class="btn btn-outline-gold btn-sm">View</a>
+                {% if a.can_reschedule %}<a href="{% url 'bookings:reschedule' a.pk %}" class="btn btn-outline-gold btn-sm">Reschedule</a>{% endif %}
+                {% if a.can_cancel %}<a href="{% url 'bookings:cancel' a.pk %}" class="btn btn-outline-danger btn-sm">Cancel</a>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-secondary mb-0">No upcoming appointments{% if status %} with this status{% endif %}.</p>
+      {% endif %}
+    </div>
+
+    <!-- History -->
+    <div class="cz-card p-4">
+      <h5 class="mb-3"><i class="bi bi-clock-history text-gold me-2"></i>Booking History</h5>
+      {% if past %}
+      <div class="table-responsive">
+        <table class="table table-cz table-hover align-middle">
+          <thead><tr><th>Ref</th><th>Service</th><th>Barber</th><th>Date</th><th>Time</th><th>Price</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {% for a in past %}
+            <tr>
+              <td class="text-gold small">{{ a.reference }}</td>
+              <td>{{ a.service.name }}</td>
+              <td>{{ a.barber.name }}</td>
+              <td>{{ a.date|date:"D, d M Y" }}</td>
+              <td>{{ a.start_time|time:"g:i A" }}</td>
+              <td>₦{{ a.price|floatformat:0|intcomma }}</td>
+              <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+              <td class="d-flex gap-1">
+                <a href="{% url 'bookings:detail' a.pk %}" class="btn btn-outline-gold btn-sm">View</a>
+                {% if a.can_review %}<a href="{% url 'reviews:leave' a.pk %}" class="btn btn-gold btn-sm">Review</a>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-secondary mb-0">No past appointments yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}My Dashboard — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+      <div>
+        <h2 class="mb-1">Welcome, {{ user.first_name|default:user.username }} 👋</h2>
+        <p class="text-secondary mb-0">Here's what's happening with your appointments.</p>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'bookings:book' %}" class="btn btn-gold"><i class="bi bi-calendar-plus me-1"></i>Book Appointment</a>
+        <a href="{% url 'bookings:my_appointments' %}" class="btn btn-outline-gold"><i class="bi bi-calendar-check me-1"></i>My Appointments</a>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-gold"><i class="bi bi-person me-1"></i>Profile</a>
+      </div>
+    </div>
+
+    <!-- stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">{{ total_count }}</div><div class="stat-label">Total Bookings</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">{{ pending_count }}</div><div class="stat-label">Pending</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">{{ completed_count }}</div><div class="stat-label">Completed</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="stat-value">{{ cancelled_count }}</div><div class="stat-label">Cancelled</div></div></div>
+    </div>
+
+    {% if todays %}
+    <div class="alert alert-warning d-flex align-items-center gap-2">
+      <i class="bi bi-bell-fill"></i>
+      <div>
+        <strong>You have an appointment today!</strong>
+        {% for a in todays %}
+          {{ a.service.name }} with {{ a.barber.name }} at {{ a.start_time|time:"g:i A" }}.
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- upcoming -->
+    <div class="cz-card p-4">
+      <h5 class="mb-3"><i class="bi bi-calendar-event text-gold me-2"></i>Upcoming Appointments</h5>
+      {% if upcoming %}
+      <div class="table-responsive">
+        <table class="table table-cz table-hover align-middle">
+          <thead>
+            <tr><th>Ref</th><th>Service</th><th>Barber</th><th>Date</th><th>Time</th><th>Duration</th><th>Price</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for a in upcoming %}
+            <tr>
+              <td class="text-gold small">{{ a.reference }}</td>
+              <td>{{ a.service.name }}</td>
+              <td>{{ a.barber.name }}</td>
+              <td>{{ a.date|date:"D, d M Y" }}</td>
+              <td>{{ a.start_time|time:"g:i A" }}</td>
+              <td>{{ a.duration_minutes }} min</td>
+              <td>₦{{ a.price|floatformat:0|intcomma }}</td>
+              <td><span class="badge-status badge-{{ a.status }}">{{ a.get_status_display }}</span></td>
+              <td><a href="{% url 'bookings:detail' a.pk %}" class="btn btn-outline-gold btn-sm">View</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-secondary mb-2">No upcoming appointments yet.</p>
+      <a href="{% url 'bookings:book' %}" class="btn btn-gold btn-sm">Book your next cut</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

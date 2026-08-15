@@ -1,0 +1,42 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Calendar — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+  <h3 class="mb-0">Appointment Calendar</h3>
+  <div class="d-flex gap-2">
+    <a href="?mode=day&date={{ anchor|date:'Y-m-d' }}" class="btn btn-sm {% if mode == 'day' %}btn-gold{% else %}btn-outline-gold{% endif %}">Day</a>
+    <a href="?mode=week&date={{ anchor|date:'Y-m-d' }}" class="btn btn-sm {% if mode == 'week' %}btn-gold{% else %}btn-outline-gold{% endif %}">Week</a>
+    <a href="?mode=month&date={{ anchor|date:'Y-m-d' }}" class="btn btn-sm {% if mode == 'month' %}btn-gold{% else %}btn-outline-gold{% endif %}">Month</a>
+  </div>
+</div>
+
+<div class="cz-card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="?mode={{ mode }}&date={{ prev_date }}" class="btn btn-outline-gold btn-sm"><i class="bi bi-chevron-left"></i></a>
+    <h5 class="mb-0 text-gold">{{ title }}</h5>
+    <a href="?mode={{ mode }}&date={{ next_date }}" class="btn btn-outline-gold btn-sm"><i class="bi bi-chevron-right"></i></a>
+  </div>
+
+  <div class="row g-2">
+    {% for day in days %}
+    <div class="{% if mode == 'day' %}col-12{% elif mode == 'week' %}col-md-3 col-lg custom-week-col{% else %}col-6 col-md-3 col-lg-2{% endif %}">
+      <div class="cal-day {% if day.date == today %}today{% endif %}">
+        <div class="d-flex justify-content-between small mb-2">
+          <span class="{% if day.date == today %}text-gold fw-bold{% else %}text-secondary{% endif %}">{{ day.date|date:"D d" }}</span>
+          {% if day.appointments %}<span class="text-gold">{{ day.appointments|length }}</span>{% endif %}
+        </div>
+        {% for a in day.appointments %}
+          <span class="cal-appt {% if a.status == 'cancelled' %}cancelled{% endif %}"
+                title="{{ a.reference }} · {{ a.customer.get_full_name|default:a.customer.username }} · {{ a.get_status_display }}">
+            {{ a.start_time|time:"g:i A" }} — {{ a.barber.name }} · {{ a.service.name|truncatechars:16 }}
+          </span>
+        {% empty %}
+          <span class="text-secondary" style="font-size:0.7rem;">—</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Customers — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<h3 class="mb-4">Manage Customers</h3>
+
+<div class="cz-card p-3 mb-4">
+  <form method="get" class="d-flex gap-2">
+    <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Search by name, username, or email…" style="max-width:360px;">
+    <button class="btn btn-gold btn-sm" type="submit"><i class="bi bi-search"></i></button>
+    {% if q %}<a href="{% url 'dashboard:customers' %}" class="btn btn-outline-gold btn-sm">Clear</a>{% endif %}
+  </form>
+</div>
+
+<div class="cz-card p-4">
+  {% if page.object_list %}
+  <div class="table-responsive">
+    <table class="table table-cz table-hover align-middle">
+      <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for c in page.object_list %}
+        <tr>
+          <td>{{ c.get_full_name|default:"—" }}</td>
+          <td>{{ c.username }}</td>
+          <td>{{ c.email|default:"—" }}</td>
+          <td>{{ c.profile.phone|default:"—" }}</td>
+          <td>{{ c.appointment_count }}</td>
+          <td>{{ c.date_joined|date:"d M Y" }}</td>
+          <td>{% if c.is_active %}<span class="badge-status badge-completed">Active</span>{% else %}<span class="badge-status badge-cancelled">Disabled</span>{% endif %}</td>
+          <td class="d-flex gap-1">
+            <a href="{% url 'dashboard:customer_detail' c.pk %}" class="btn btn-outline-gold btn-sm">View</a>
+            <form method="post" action="{% url 'dashboard:customer_toggle' c.pk %}"
+                  onsubmit="return confirm('{% if c.is_active %}Disable{% else %}Enable{% endif %} account {{ c.username }}?');">
+              {% csrf_token %}
+              <button class="btn btn-sm {% if c.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                {% if c.is_active %}Disable{% else %}Enable{% endif %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page.has_other_pages %}
+  <nav>
+    <ul class="pagination pagination-sm justify-content-center mb-0">
+      {% if page.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}&q={{ q }}">‹</a></li>{% endif %}
+      <li class="page-item active"><span class="page-link">{{ page.number }} / {{ page.paginator.num_pages }}</span></li>
+      {% if page.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}&q={{ q }}">›</a></li>{% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+  {% else %}
+  <p class="text-secondary mb-0">No customers found.</p>
+  {% endif %}
+</div>
+{% endblock %}

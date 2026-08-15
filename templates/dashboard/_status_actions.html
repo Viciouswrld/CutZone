@@ -1,0 +1,22 @@
+{# Small inline status-change buttons for one appointment (a). #}
+<div class="d-flex gap-1 flex-wrap">
+  {% if a.status == 'pending' %}
+  <form method="post" action="{% url 'dashboard:appointment_status' a.pk 'confirmed' %}">{% csrf_token %}
+    <button class="btn btn-sm btn-outline-info" title="Confirm"><i class="bi bi-check2"></i></button>
+  </form>
+  {% endif %}
+  {% if a.status == 'pending' or a.status == 'confirmed' %}
+  <form method="post" action="{% url 'dashboard:appointment_status' a.pk 'completed' %}">{% csrf_token %}
+    <button class="btn btn-sm btn-outline-success" title="Mark completed"><i class="bi bi-check2-all"></i></button>
+  </form>
+  <form method="post" action="{% url 'dashboard:appointment_status' a.pk 'cancelled' %}"
+        onsubmit="return confirm('Cancel appointment {{ a.reference }}?');">{% csrf_token %}
+    <button class="btn btn-sm btn-outline-danger" title="Cancel"><i class="bi bi-x"></i></button>
+  </form>
+  {% endif %}
+  {% if a.status == 'cancelled' %}
+  <form method="post" action="{% url 'dashboard:appointment_status' a.pk 'pending' %}">{% csrf_token %}
+    <button class="btn btn-sm btn-outline-warning" title="Re-open as pending"><i class="bi bi-arrow-counterclockwise"></i></button>
+  </form>
+  {% endif %}
+</div>

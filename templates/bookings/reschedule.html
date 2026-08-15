@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static humanize %}
+{% block title %}Reschedule {{ appt.reference }} — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container" style="max-width: 760px;">
+    <div class="text-center mb-4">
+      <h2 class="section-title d-inline-block">Reschedule Appointment</h2>
+      <p class="text-secondary">Pick a new date and time. The service and barber stay the same.</p>
+    </div>
+
+    <div class="cz-card p-4 mb-4">
+      <div class="d-flex flex-wrap gap-4 justify-content-center text-center">
+        <div><div class="text-secondary small">Reference</div><div class="text-gold">{{ appt.reference }}</div></div>
+        <div><div class="text-secondary small">Service</div><div>{{ appt.service.name }} ({{ appt.service.duration_minutes }} min)</div></div>
+        <div><div class="text-secondary small">Barber</div><div>{{ appt.barber.name }}</div></div>
+        <div><div class="text-secondary small">Current slot</div><div>{{ appt.date|date:"d M Y" }} · {{ appt.start_time|time:"g:i A" }}</div></div>
+      </div>
+    </div>
+
+    <form id="booking-form" method="post"
+          data-slots-url="{% url 'bookings:slots' %}" data-exclude="{{ appt.pk }}" novalidate>
+      {% csrf_token %}
+      <!-- service & barber are fixed server-side; hidden values keep the JS working -->
+      <input type="hidden" id="id_service" value="{{ appt.service_id }}">
+      <input type="hidden" id="id_barber" value="{{ appt.barber_id }}">
+      <input type="hidden" name="start_time" id="id_start_time" value="">
+
+      <div class="cz-card p-4">
+        <div class="mb-4">
+          <h6><span class="step-number">1</span>Choose a new date</h6>
+          <input type="date" name="date" id="id_date" class="form-control mt-2" style="max-width:280px;"
+                 min="{{ min_date }}" max="{{ max_date }}" required>
+        </div>
+        <div class="mb-4">
+          <h6><span class="step-number">2</span>Choose an available time</h6>
+          <p id="slots-hint" class="text-secondary small">Pick a date to see available times.</p>
+          <div id="slots-box" class="d-flex flex-wrap gap-2"></div>
+        </div>
+        <p id="summary-box" class="text-gold small d-none"></p>
+        <div class="d-flex gap-2">
+          <button type="submit" id="submit-btn" class="btn btn-gold" disabled>
+            <i class="bi bi-arrow-repeat me-2"></i>Confirm Reschedule
+          </button>
+          <a href="{% url 'bookings:detail' appt.pk %}" class="btn btn-outline-gold">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/booking.js' %}"></script>
+<script>
+  // Service & barber are fixed on reschedule — load slots when date changes.
+  document.addEventListener("DOMContentLoaded", function () {
+    var dateInput = document.getElementById("id_date");
+    if (dateInput) dateInput.dispatchEvent(new Event("change"));
+  });
+</script>
+{% endblock %}

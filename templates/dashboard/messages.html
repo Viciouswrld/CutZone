@@ -1,0 +1,44 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Contact Messages — CutZone Admin{% endblock %}
+
+{% block dash_content %}
+<h3 class="mb-4">Contact Messages</h3>
+
+<div class="row g-3">
+  {% for m in contact_messages %}
+  <div class="col-md-6">
+    <div class="cz-card p-4 {% if not m.is_read %}border-warning{% endif %}">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="mb-0">{{ m.subject }}</h6>
+          <div class="small text-secondary">{{ m.name }} · {{ m.email }}{% if m.phone %} · {{ m.phone }}{% endif %}</div>
+        </div>
+        {% if m.is_read %}
+          <span class="badge-status badge-completed">Read</span>
+        {% else %}
+          <span class="badge-status badge-pending">New</span>
+        {% endif %}
+      </div>
+      <p class="text-secondary small mb-3">{{ m.message }}</p>
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="small text-secondary">{{ m.created_at|date:"d M Y, g:i A" }}</span>
+        <div class="d-flex gap-1">
+          {% if not m.is_read %}
+          <form method="post" action="{% url 'dashboard:message_read' m.pk %}">{% csrf_token %}
+            <button class="btn btn-outline-gold btn-sm">Mark read</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{% url 'dashboard:message_delete' m.pk %}"
+                onsubmit="return confirm('Delete this message?');">
+            {% csrf_token %}
+            <button class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-secondary">No contact messages yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

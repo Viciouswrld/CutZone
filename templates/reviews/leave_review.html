@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Leave a Review — CutZone{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container" style="max-width: 620px;">
+    <div class="cz-card p-4">
+      <h4 class="mb-1"><i class="bi bi-star text-gold me-2"></i>Rate Your Experience</h4>
+      <p class="text-secondary small mb-4">
+        {{ appt.service.name }} with {{ appt.barber.name }} on {{ appt.date|date:"d M Y" }}
+      </p>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label d-block">Your rating *</label>
+          <div class="star-picker fs-2" role="radiogroup" aria-label="rating">
+            {% for i in "12345" %}
+              <i class="bi bi-star star-empty" data-value="{{ forloop.counter }}" style="cursor:pointer;"></i>
+            {% endfor %}
+          </div>
+          <input type="hidden" name="rating" id="id_rating" value="{{ form.rating.value|default:'' }}">
+          {% for e in form.rating.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Your review</label>
+          {{ form.comment }}
+          {% for e in form.comment.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-gold">Submit Review</button>
+          <a href="{% url 'bookings:detail' appt.pk %}" class="btn btn-outline-gold">Back</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Simple interactive 5-star picker feeding the hidden rating input.
+  document.addEventListener("DOMContentLoaded", function () {
+    var stars = document.querySelectorAll(".star-picker i");
+    var input = document.getElementById("id_rating");
+    function paint(value) {
+      stars.forEach(function (s) {
+        var v = parseInt(s.dataset.value, 10);
+        s.className = v <= value ? "bi bi-star-fill star" : "bi bi-star star-empty";
+      });
+    }
+    stars.forEach(function (s) {
+      s.addEventListener("click", function () {
+        input.value = s.dataset.value;
+        paint(parseInt(s.dataset.value, 10));
+      });
+    });
+    if (input.value) paint(parseInt(input.value, 10));
+  });
+</script>
+{% endblock %}
